@@ -1,0 +1,832 @@
+\documentclass[letter, 12pt]{article}
+
+\usepackage[usenames,dvipsnames]{color}
+
+\usepackage{amsmath}
+
+\usepackage{graphicx}
+
+\usepackage{fontspec} % support opentype text fonts
+
+%\usepackage{unicode-math} % support opentype math fonts
+
+\usepackage{xcolor}
+
+\usepackage{microtype}
+
+\usepackage[english]{babel}
+
+%\usepackage[utf8x]{inputenc}
+
+\usepackage[T1]{fontenc}
+
+\usepackage{utopia}
+
+\usepackage{fourier}
+
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+%
+
+%
+
+\newcommand{\Kernel}{\text{null}}
+
+\newcommand{\transpose}{^\mathsf{T}}
+
+\newcommand{\I}{{I}}
+
+\newcommand{\Rfree}{R_f}
+
+\newcommand{\Rsf}{r_{\SDF e}}
+
+\newcommand{\RetOp}{\mathbf{R}}
+
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\SDF}{m}
+
+\newcommand{\Sec}{\R^N}
+
+\newcommand{\Ret}{\mathcal S}
+
+\newcommand{\Span}{\text{span}}
+
+\newcommand{\abs}[1]{\left| #1 \right|}
+
+\newcommand{\trace}[1]{{\text{tr}}\left( #1 \right)}
+
+\newcommand{\br}{\boldmath r}
+
+\newcommand{\teps}{\tilde \epsilon}
+
+\newcommand{\tr}{\tilde r}
+
+\newcommand{\tu}{\tilde u}
+
+\newcommand{\tv}{\tilde v}
+
+\newcommand{\tw}{\tilde w}
+
+\newcommand{\tA}{\tilde A}
+
+\newcommand{\tB}{\tilde B}
+
+\newcommand{\tU}{\tilde U}
+
+\newcommand{\tV}{\tilde V}
+
+\newcommand{\tD}{\tilde D}
+
+\newcommand{\tLambda}{\tilde{\Lambda}}
+
+\newcommand{\tsigma}{\tilde{\sigma}}
+
+\newcommand{\hr}{\hat{r}}
+
+\newcommand{\hf}{\hat{f}}
+
+\newcommand{\hg}{\hat{g}}
+
+\newcommand{\ba}{\mathbf{a}}
+
+\newcommand{\bb}{\mathbf{b}}
+
+\newcommand{\bc}{\mathbf{c}}
+
+\newcommand{\bd}{\mathbf{d}}
+
+\newcommand{\be}{\mathbf{e}}
+
+\newcommand{\bu}{\mathbf{u}}
+
+\newcommand{\bv}{\mathbf{v}}
+
+\newcommand{\bw}{\mathbf{w}}
+
+\newcommand{\bx}{\mathbf{x}}
+
+\newcommand{\by}{\mathbf{y}}
+
+\newcommand{\bz}{\mathbf{z}}
+
+\newcommand{\bA}{\mathbf{a}}
+
+\newcommand{\bB}{\mathbf{b}}
+
+\newcommand{\bC}{\mathbf{c}}
+
+\newcommand{\bD}{\mathbf{D}}
+
+\newcommand{\bE}{\mathbf{E}}
+
+\newcommand{\bF}{\mathbf{F}}
+
+\newcommand{\bG}{\mathbf{G}}
+
+\newcommand{\bH}{\mathbf{H}}
+
+\newcommand{\bU}{\mathbf{u}}
+
+\newcommand{\bV}{\mathbf{v}}
+
+\newcommand{\bW}{\mathbf{w}}
+
+\newcommand{\bX}{\mathbf{x}}
+
+\newcommand{\bY}{\mathbf{y}}
+
+\newcommand{\bZ}{\mathbf{z}}
+
+\newcommand{\port}{w}
+
+\newcommand{\portw}{w}
+
+\newcommand{\portv}{v}
+
+\newcommand{\portu}{u}
+
+\newcommand{\calA}{\mathcal{A}}
+
+\newcommand{\calB}{\mathcal{B}}
+
+\newcommand{\calF}{\mathcal{F}}
+
+\newcommand{\calL}{\mathcal{L}}
+
+\newcommand{\calS}{\mathcal{S}}
+
+\newcommand{\calX}{\mathcal{X}}
+
+\newcommand{\calY}{\mathcal{Y}}
+
+\newcommand{\calZ}{\mathcal{Z}}
+
+\newcommand{\corr}{\text{cor}}
+
+\newcommand{\cov}{\text{cov}}
+
+\newcommand{\hadamard}{\circ}
+
+\newcommand{\suchthat}{\text{s.t.}}
+
+\newcommand{\etal}{\emph{et al.}}
+
+\newcommand{\cossim}{\text{sim}}
+
+\newcommand{\negatives}{\mathcal{N}}
+
+\newcommand{\norm}[1]{\left|\left|#1 \right|\right|}
+
+\newcommand{\positives}{\mathcal{P}}
+
+\newcommand{\proj}{\text{proj}}
+
+\newcommand{\sdv}{\text{sd}}
+
+\newcommand{\sign}[1]{\text{sgn} \left(#1 \right)}
+
+\newcommand{\diag}[1]{\text{diag} \left(#1 \right)}
+
+%\newcommand{\transpose}{'}%{^\mathsf{T}}
+
+\newcommand{\var}{\text{var}}
+
+\newcommand{\inv}{^{-1}}
+
+\newcommand{\eqdist}{\stackrel{d}{=}}
+
+\newcommand{\refpar}[1]{(\ref{#1})}
+
+\newcommand{\exdiff}[1]{{[#1]}}
+
+\newcommand{\similar}[2]{{\text{sim}\left( #1, #2\right)}}
+
+\newcommand{\Image}[1]{\text{Im}\left[#1]\right)}
+
+ 
+
+%
+
+%
+
+\title{Stress-Testing}
+
+\author{Version 0.2}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent{\small \textbf{Executive Summary}: \textit{This note proposes a scenario-based approach to stress-testing based on a modification of a pre-existing probability distribution of returns that incorporates expert encodings of possible scenarios}.}
+
+ 
+
+\section{Introduction}
+
+Models of asset returns are used by asset managers and banks to generate \emph{ex ante} risk measures of their holdings. Based on these measures, asset managers make ongoing decisions of asset coverage, diversification, hedging, contingency insurance, drawdown management, portfolio construction, performance attribution and capital allocation. Given their intended application, risk models should perform well in times of high turbulence and around periods in which the risk regime changes abruptly; in times of low risk, or when the regime is stationary, accuracy is important, but not critical. However, oftentimes the opposite happens: risk models work well in ``normal'' times, when we need them the least, and in turbulent times they are inaccurate, to the point of being counterproductive. Among their shortcomings:
+\begin{itemize}
+\item They under-forecast volatility and VaR during a turbulent period, and over-forecast it afterward. Portfolio managers over-deploy risk entering a crisis, and under-deploy after it is over, when they should re-risk aggressively.
+\item They attribute portfolio returns to factors that explain a small fraction of the portfolio's systematic risk.
+\end{itemize}
+The decisions affected by model inadequacy are:
+\begin{itemize}
+\item \emph{Leverage Ratios}. Managers are overlevered coming into a financial crisis;
+\item \emph{Capital Allocation}. Because of the large estimation error in risk metrics, capital and risk is misallocated among different strategies and asset classes;
+\item \emph{Portfolio construction}. Prior to a crisis, certain factors are shown to drive portfolio risk and their exposure is reduced; e.g., size or momentum. During a crisis, a different set of factors is responsible for the losses. Hedging these factors on an ongoing basis may not be feasible because, in addition to driving only a small percentage of total risk, they are responsible for significant profits. An example is short interest.
+\end{itemize}
+One approach taken by practitioners to remedy the shortcomings of models of asset returns, factor-based or general ones, is that of \emph{stress-testing} the model. The intuition is to change the inputs to the model beyond its normal operating regime in order to assess the sensitivity of the output -- the risk metrics -- on these inputs. Beyond this very broad definition, there is little agreement on the theory and practice how stress testing should be. In engineering, where the term originated over a century ago\footnote{The first occurrence of the term ``stress testing'' dates back to 1904 in the magazine \emph{Practical Engineer} and refers to material testing.}, stress-testing means to subject an actual physical system to unusual stimulus. In finance, we stress-test models. Abstractions of real phenomena are not easy to stress. This note is devoted to describing these different approaches, and to recommending best practices. The rest of this document is organized as follows. In the next section we describe the principles stress-testing framework. In the appendix we detail the mathematical formulation of the problem and review the literature.
+\section{Framework}
+Our approach to stress-testing rests on two principles, which are shared with all stress-testing alternatives. The first one is that the risk model contains useful information about the true distribution of returns, but is inaccurate and therefore needs to be modified. The second principle is that stress-testing is contingent on the specification of one or more scenarios. They can be based on history (thus generalizing historical stress-testing) but can also go beyond it, by incorporating contextual information and expert judgement. For example,  the financial crisis of 2008 was preceded by multiple warning signs, some of which shared by other crises, some new: the softening of the residential real estate market; increase in interbank lending; increase in securitized product; the bankruptcy and forced takeover of one the five largest U.S. investment banks. These signs were not detectable in commercial equities risk models, but could have been incorporated in a stress-testing model well in advance of the Sept. 2008 crash. 
+
+
+The two steps -- stress-test of the model and scenario specification -- are inter-dependent. The \emph{inputs} to the process are the risk model and the scenarios. Regarding the first, we assume that the return process is multivariate normal and described by a covariance matrix. Regarding the latter, we model these as sets of portfolios, each of each of which as an associated stress return, and with a return horizon. Portfolios allow for great generality. For example, a portfolio could include
+\begin{enumerate}
+
+\item  Sub-portfolios of the portfolio under consideration. For example, we want to investigate the impact of the energy portfolios on the aggregate portfolio;
+\item Single assets. Is a large drawdown of a single asset a concern, or will its losses/gains be balanced by other highly correlated assets in the portfolio?
+\item Factors. Factor in a portfolio
+\item Single as
+\item \emph{Scenarios}. Each scenario consists of a number of portfolios and associated losses. The portfolios can be factor portfolios, custom factor portfolios, invested portfolios, or even single assets.
+
+\item \emph{Risk Model}. An asset covariance matrix, possibly expressed as a factor model. This is however not a requirement.
+
+\item \emph{Stress index}. This is a single positive value. The higher the value, the greater the tolerance we have for adverse probability distribution indices generated by the stress tester.
+
+\end{enumerate}
+
+\subsection{Qualitative Approach}
+
+In our stress-testing problem formulation, we estimate a modified risk model or probability distribution. This distribution uses either our default factor risk model, or a set of simulated or historical samples of asset returns. The ``stress index'' gives a limit on how much the base risk model needs to change in order to accommodate the views expressed as inputs.
+
+\subsection{Output}
+
+The output is the PnL distribution of our portfolio. Any additional measure, say the 01VaR, can be computed from this distribution.
+
+
+
+\section{Appendix}
+\subsection{Previous Work and Common Approaches}
+
+There is no agreed-upon interpretation of stress-testing in the literature, and the published papers on the subject are few. The most relevant implementation of stress-testing arises from regulations developed in the aftermath of the financial crisis of 2008. Section 164(i)(2) of the Frank-Dodd Act requires that banks with assets over \$10Bn meet stress tests (Dodd-Frank Act Stress Test, or DFAST \cite{fed2013}) specified every year by the Deposit Insurance Corporation. In addition, The Federal Reserve of New York requires that banks with assets over \$50Bn meet additional stress tests (Comprehensive Capital Analysis and Review, or CCAR \cite{fed2017, fed2018}). All tests have the objective of determining the viability (capital adequacy and risk management practices) of these lending institutions in regimes of heightened financial and economic stress. The approach is conceptually straightforward: regulators specify only three scenarios: baseline, adverse, and severely adverse, through the release of quarterly data of macroeconomic indicators (Table \ref{table:DFAST})
+
+\begin{table}[ht]
+
+\centering
+
+\caption{Macroeconomic indicators used to define scenarios of the Dodd-Frank Act Stress Test.}
+
+\label{table:DFAST}
+
+\begin{tabular}{l}
+
+\\
+
+\hline
+
+U.S. real GDP growth \\
+
+U.S. nominal GDP growth \\
+
+U.S. real disposable income growth \\
+
+U.S. nominal disposable income growth \\
+
+U.S. unemployment rate \\
+
+U.S. CPI inflation \\
+
+U.S. 3-month Treasury rate \\
+
+U.S. 5-year Treasury yield \\
+
+U.S. 10-year Treasury yield \\
+
+U.S. BBB corporate yield \\
+
+U.S. mortgage rate \\
+
+U.S. prime rate \\
+
+U.S. Dow Jones Total Stock Market Index\\
+
+U.S. House Price Index \\
+
+U.S. Commercial Real Estate Price Index\\
+
+U.S. Market Volatility Index (VIX) \\
+
+Euro area real GDP growth \\
+
+Euro area inflation \\
+
+Developing Asia real GDP growth \\
+
+Developing Asia inflation \\
+
+Japan real GDP growth \\
+
+Japan inflation \\
+
+U.K. real GDP growth \\
+
+U.K. inflation \\
+
+Exchange rates \\
+
+\hline
+
+\end{tabular}
+
+\end{table}
+
+It is up to the firms to a) specify the causal model relating asset prices to macroeconomic indicators; b) run the scenarios in this model; c) show good calibration properties under the baseline scenario, and adequacy under the adverse scenarios. The core of the exercise is the first part: model building. In this respect, the term ``stress-testing'' is almost a misnomer. The main challenge faced by bank risk groups is to persuade the regulators that their models are credible. The situation faced by an asset manager differs in two important respects. First, we already have a risk model; however, we have reason to believe that the model produces inaccurate forecasts in times of stress. Secondly, our scenarios have higher resolutions than ``baseline/adverse/severely adverse'', and are greater in number. For example: would happen if the portfolio of manager $x$ lost 10\%? Obviously there are correlations between this portfolio and other portfolios in the same firm, so considering the portfolio in isolation underestimating risk; while assuming a 10\% loss across all portfolios severely overestimate it. What if just the energy Explorers and Producers have a large drawdown? What if simply their correlations with midstream and energy services increases? In other words, we need a \emph{flexible and intuitive} language to express our hypothesis on what could go wrong.
+
+Let us review the extant literature specifically devoted to stress testing. Auer \cite{auer2018} devotes two pages to stress testing, in which he views the practice as propagating negative scenarios in the portfolio, possibly via non-linear instruments. Andersen \etal \cite{andersen2013} as well as Stulz \cite{stulz2008} emphasize the importance of \emph{conditional} measures of extreme risk, as opposed to unconditional ones, based on Dan{\'i}elsson \etal \cite{danielsson2016} propose to estimate model risk as the range of forecasts and risk metrics generated by the set of available models. For example, if different GARCH-based models generate VaR estimates that differ by 50\%, a measure of the error of the VaR of the baseline model is 50\%. Becker and Schmidt \cite{becker2013} propose an endogenous stress model, in which factor volatilities and correlations are increasing function of the market state, proxied by drawdown of market indices during a rolling time window. So \etal \cite{so2013}, following \cite{rebonato2000}, propose a numerical procedure to change the correlation matrix while maintaining positive-definiteness. Meucci \cite{meucci2008} proposes to change the change the model probability distribution in order to meet some constraints.
+
+The approaches share one feature. They can all involve changing the probability distribution of the reference model. The mechanism inducing the change differs, and can be divided in two camps. In the first one \cite{fed2013, fed2017, fed2018, meucci2008}, the user specifies scenarios (or views), and then modifies the model accordingly. A simple example would be that of an asset with daily volatility of 1.5\% and zero expected return. Its model-based 1\% VaR is -3.5\%. If we require that, under an adverse scenario the 1\% VaR be -10\%, then, assuming that the asset is still normally distributed, it must have a volatility of 4.3\%. This volatility, together with that of other assets will be the used to estimate the stress-tested risk metric of a portfolio\footnote{A na{\"i}ve scenario-based analysis is also a change of probability distribution; we assign p=1 to the scenario.}.
+
+In the second approach \cite{danielsson2016, so2013, rebonato2000}, the user changes some parameters of the model family, and checks the impact on the portfolio. To stick to our previous example, this means that we directly increase the volatility of the asset to 5\% and then check the impact on the portfolio.
+
+In the next section we propose an approach that general enough to accommodate both approaches.
+%\section{Description of the Quantitative Approach}
+
+%\subsection{Formulation}
+
+%I describe the case of a single-period stress test. We start with the case of a finite number $m$ of scenarios. Each scenario occurs according to base probability distribution $\{\pi_i > 0: i=1,\ldots, m\}$ and each scenario is characterized by a set of returns for the $n$ assets. Let $\{r_i\in \R^n: i=1,\ldots, m\}$ be the vectors of returns associated to the $m$ scenarios. In practical application, we have a continuous probability distribution, for which we simulate $m$ scenarios. In this case, the empirical distribution of simulated samples is given by $\pi_i=1/m$.
+
+%
+
+%Let the portfolios associated to the $q$ views be $(w_j\in\R^n :j=1,\ldots, q\}$. The payoffs associated to the views are
+
+%\begin{align*}
+
+% \begin{bmatrix}
+
+% w_1\transpose r_1 & w_1\transpose r_2 &\ldots & w_1\transpose r_m\\
+
+% w_2\transpose r_1 & w_2\transpose r_2 &\ldots & w_2\transpose r_m\\
+
+% \ldots & \ldots & \ldots & \ldots\\
+
+% w_q\transpose r_1 & w_q\transpose r_2 &\ldots & w_q\transpose r_m
+
+% \end{bmatrix}
+
+%\end{align*}
+
+%Let $s_{ij}$ be the payoff associated to portfolio $i$ under scenario $j$.
+
+%Our goal is to identify a \emph{stress-tested probability distribution} $\{p_i>0: i=1,\ldots, m\}$ for scenario $i$.
+
+%
+
+%We show how to encode some of the common constraints.
+
+%\begin{itemize}
+
+%\item \emph{VaR constraint}: We require that the 5th percentile VaR on the $j$th portfolio is equal to $v$. Let $\calS\subset\{1,\ldots, m\}$ be the set of scenarios with such that $w_j\transpose r_i\le v$. Then the constraint becomes
+
+%\begin{align*}
+
+% \sum_{i\in\calS} p_i = 0.05
+
+%\end{align*}
+
+%\item \emph{Expected loss constraint}: If the constraint is on expected loss, then we write it as
+
+%\begin{align*}
+
+% \sum_{i=1}^m s_{ji} p_i= \text{(expected loss)}
+
+%\end{align*}
+
+%\item \emph{Volatility constraint}: Similarly, a constraint on the second moment is
+
+% \begin{align*}
+
+% \sum_{i=1}^m s_{ji}^2 p_i = \text{(second moment)}
+
+%\end{align*}
+
+%\item \emph{Covariance/correlation constraint}: A constraint on the covariance of two portfolios $j,k$ is given by\footnote{We ignore the first moment, which is usually smaller than the second moment for most factor-neutral or dollar-neutral portfolios.}
+
+%\begin{align*}
+
+% \sum_{i=1}^m p_i s_{ji}s_{ki} = \text{(second moment)}
+
+%\end{align*}
+
+%A constraint on the correlation is also possible. The general form is non-convex:
+
+%\begin{align*}
+
+% \sum_{i=1}^m p_i w_j\transpose r_i w_k\transpose r_i = \rho
+
+% \left(
+
+% \sum_{i=1}^m p_i (w_j\transpose r_i)^2 \sum_{\ell=1}^m p_\ell (w_k\transpose r_\ell)^2
+
+% \right)^{1/2}
+
+%\end{align*}
+
+%However, the constraint on correlation becomes linear if we include constraints on the volatilities of the portfolios $w_j, w_k$.
+
+%\begin{align*}
+
+% \sum_{i=1}^m p_i w_j\transpose r_i w_k\transpose r_i = \rho \sigma_j\sigma_k
+
+%\end{align*}
+
+%\item \emph{Average correlation constraint}: It is also of interest to examine the scenario in which the average correlation among portfolios increases. We assume that the volatility of the portfolios is set to $\sigma_i, i=1,\ldots, q$. The constraint takes the form
+
+%\begin{align*}
+
+% \sum_{j,k} \sum_{i=1}^m p_i\frac{r_i\transpose w_j}{\sigma_j} \transpose \frac{r_i\transpose w_k}{\sigma_k} = {m^2} \rho +m\\
+
+% \sum_{i=1}^m \left(\sum_{j} \frac{ r_i\transpose w_j}{\sigma_j} \transpose \right)^2 p_i = {m^2} \rho +m
+
+% \end{align*}
+
+%\end{itemize}
+
+%
+
+%These constraints, and many others, can be expressed not only on factors of existing risk models, but also on arbitrary portfolios and custom risk factors. The approach is not tied to factor risk models.
+
+%
+
+%The constraints that the stress-test probability distribution must satisfy are $A p=b$; in addition, $p_i$ must be a probability distribution, i.e., $p\ge 0$ and $\sum_i p_i=1$. Since these can be expressed as a set of linear inequalities, we extend $A$ and $b$ to include them.
+
+%
+
+%
+
+%We need a criterion to select a suitable distribution among then many that satisfy this linear system.
+
+%
+
+%One guiding principle is to choose, among all such distributions, the one that is the closest to the model distribution, according to some measure of similarity. One measure with good theoretical properties (\cite{cover2006}, Ch. 11; \cite{hansen2008}; \cite{breuer2016}) is the relative entropy between $p$ and $\pi$:
+
+%\begin{align*}
+
+% \text{\emph{Max Entropy}}:\min \,& \sum_i p_i\log \frac{p_i}{\pi_i}\\
+
+% \suchthat\, & A p= b\\
+
+%\end{align*}
+
+%This is the problem of identifying a probability distribution $p$ that satisfies linear constraints (e.g., moment constraints) and has the smallest divergence from a probability distribution $\pi$.
+
+%
+
+%
+
+%A more general problem is the following:
+
+%\begin{align*}
+
+% \text{\emph{Primal}}:\min \,&\sum_i v_i p_i + \mu \sum_i p_i \log \frac{p_i}{\pi_i} \\
+
+% \suchthat\, & A p = b
+
+%\end{align*}
+
+%which involves maximizing a linear function on a convex feasible region\footnote{There could be $n$ additional inequalities $p\ge 0$, but we will see ex post that $p_i>0$ for each $i$}.
+
+%
+
+%Let us price out the relative entropy constraint. This is not an issue for us, as we' ll explore the entire frontier as the relative entropy becomes a dominant term.
+
+%
+
+%
+
+%Define $k_i:=\pi_i\exp(-v_i/\mu)$. The objective function can be rewritten as
+
+%$$\mu \sum_i p_i \log \left(\frac{p_i e^{v_i/\mu}}{\pi_i}\right)=\mu \sum_i p_i \log \left(p_i/k_i\right)$$
+
+%\textcolor{blue}{
+
+%\begin{align*}
+
+% \text{\emph{Relaxed Primal}}:\min \, & \sum_i p_i\log \frac{p_i}{k_i} \\
+
+% \suchthat\, & A p= b
+
+%\end{align*}
+
+%}
+
+%\subsection{Dual Formulation}
+
+%The Lagrangian is
+
+%\begin{align*}
+
+% L(p,\lambda)= \sum_i p_i\log \left(p_i/k_i\right) -\lambda\transpose (Ap-b)
+
+%\end{align*}
+
+%As part of the KKT conditions, the solution $p^\star$ of the Relaxed Primal must satisfy the equation
+
+%\begin{align*}
+
+% p_i^\star=k_i\exp\left( (A\transpose\lambda)_i-1\right)
+
+%\end{align*}
+
+%Replacing in the Lagrangian, we obtain the objective function of the dual that must be maximized
+
+%\begin{align*}
+
+% -\sum_i k_i\exp\left( (A\transpose\lambda)_i-1\right)+\lambda\transpose b
+
+%\end{align*}
+
+%We rewrite the dual problem as a minimization problem:
+
+%\textcolor{blue}{
+
+%\begin{align*}
+
+% \text{\emph{Relaxed Dual}}:\min \, & \sum_i k_i \exp\left( (A\transpose\lambda)_i-1\right)-\lambda\transpose b\\
+
+% \suchthat\, & \lambda\in\R^m
+
+%\end{align*}
+
+%}
+
+%
+
+%\subsection{Second-Order Method}
+
+%%
+
+%Assume we want to solve the unconstrained problem $\min_x f(x)$, we assume that $f$ is twice differentiable and strictly convex. We approximate $f$ at point $x$ up to quadratic terms, and solve for
+
+%\begin{align*}
+
+% \min \, & (\nabla f(x))\transpose d +(1/2) d\transpose(\nabla^2 f) d
+
+%\end{align*}
+
+%which gives a direction
+
+%
+
+%The KKT conditions yield
+
+%\begin{align*}
+
+%d=& -(\nabla^2f)^{-1} \nabla f
+
+%\end{align*}
+
+%Once the direction is found, we perform a line search:
+
+%\begin{align}
+
+% \min\,& f(x+\theta d) \label{eq:linesearch}\\
+
+% \suchthat\,& \theta\ge 0 \notag
+
+%\end{align}
+
+%We then update $x$ with the new value, and iterate until convergence.
+
+%Let $P^\star$ be the $n\times n$ diagonal matrix with $p^\star$.
+
+%i.e., $\nabla f=Ap^\star-b$, and $\nabla^2f=A P^\star A\transpose$, so that
+
+%$$d=-(AP^\star A\transpose)^{-1} (Ap^\star-b)$$
+
+%The complexity of each step is dominated by the matrix multiplication $AP^\star A\transpose$, which is $m^2n$.
+
+%
+
+%The algorithm is as follows:
+
+%\begin{enumerate}
+
+% \item \textbf{Input}: $A, b, v, \mu$.
+
+% \item Initialization:
+
+% \begin{align*}
+
+% \lambda \leftarrow & 0
+
+% \end{align*}
+
+% \item Update:
+
+% \begin{align*}
+
+% p_i\leftarrow & k_i\exp\left( (A\transpose\lambda)_i-1\right)\\
+
+% P \leftarrow & \diag{p}\\
+
+% d\leftarrow & (AP A\transpose)^{-1} (Ap-b)\\
+
+% \lambda \leftarrow &\arg\min\{f(x) | x= \lambda +\theta d, \theta\in \R \}
+
+% \end{align*}
+
+% \item Repeat step 3 until convergence.
+
+% \item \textbf{Output}: $\lambda, p$.
+
+%\end{enumerate}
+
+\section{Appendix: Conditional Expectation for Multivariate Gaussians}
+
+Let $\xi$ a random vector distributed according to a multivariate Normal with mean $\mu_\xi\in\R^n$ and variance $\Sigma_\xi \in\R^{n\times n}$. Partition the vector $\xi$ in two sub-vectors $x\in \R^m, y\in\R^{n-m}$. Notation:
+
+\begin{align*}
+\xi:=\left(
+\begin{array}{c}
+x\\
+y
+\end{array}
+\right) & &
+\mu_\xi:=\left(
+\begin{array}{c}
+\mu_x\\
+\mu_y
+\end{array}
+\right)& 
+\Sigma_\xi:=\left(
+\begin{array}{cc}
+\Sigma_{xx} & \Sigma_{xy}\\
+\Sigma_{yx} & \Sigma_{yy}
+\end{array}
+\right)
+\end{align*}
+
+We observe a realization of $x$, $\tilde x\in \R^m$. The conditional distribution of $y$ given $x$ is still Normal, with
+
+%
+
+%
+
+\begin{align}
+\tilde\mu_y=&\mu_y + \Sigma_{yx} \Sigma_{xx}\inv(\tilde x-\mu_x) \label{eq:cond1} \\
+\tilde\Sigma_{yy}=& \Sigma_{yy} - \Sigma_{yx} \Sigma_{xx}\inv \Sigma_{xy} \notag
+\end{align}
+%
+We generalize the approach as follows: let $A\in\R^{n\times p}$ and $b\in\R^p$. We find the distribution of $\xi$ conditional on the constraint
+$$A\transpose \xi = b$$
+The proof is algebraically involved but its strategy is simple: first, perform a variable transformation such that we can use Eqs. (\ref{eq:cond1}). Then transform the variables back into the original problem.
+
+First of all, we can assume, without loss of generality, the matrix $A$ satisfies $A\transpose A= I$\footnote{If not, write the SVD of $A=U\Lambda V\transpose$, with $U\in\R^{n\times n}$, $\Lambda \in\R^{n\times m}$, $V\in\R^{m\times m}$. The matrices $U$ and $V$ are unitary; $\Lambda[1:m, 1:m]$ is diagonal and positive definite, and $\Lambda[(m+1):n, 1:m]$ is identically zero.
+
+\[
+A\transpose\xi=b \Leftrightarrow V\Lambda\transpose U\transpose \xi = b \Leftrightarrow \Lambda\transpose U\transpose \xi = V b \Leftrightarrow U[1:n, 1:m]\transpose \xi = (\Lambda[1:m, 1:m])\inv V b
+\]}.
+%
+\begin{enumerate}
+\item Complete the columns of $A$ to make an orthonormal basis in $\R^n$. The matrix $B$ is such that its columns are the additional basis vectors. Therefore $H:=(A | B)\in\R^{n\times n}$ is an orthonormal matrix\footnote{The columns $b_i$ of $B$ are the eigenvectors of the null space of $A\transpose$: $A\transpose b_i=0$. They correspond to the $m+1,\ldots, n$ columns of $V$ in the Singular Value Decomposition of $A$.}.
+
+\item Let $\zeta:=H\transpose \xi$. As we did with $\xi$, partition $\zeta$ into two vectors: $u\in\R^m$ and $v\in\R^{n-m}$. From the definition, it is $u=A\transpose\xi$ and $v=B\transpose\xi$. Under this change of coordinates, the constraint $A\transpose \xi=b$ becomes $u=b$.
+
+\item Since $\xi$ is multivariate Gaussian, $\zeta\sim N(H\transpose\mu_\xi, H\transpose \Sigma_\xi H)$. Use for mean and variance of $\zeta$ the same notation used for $\xi$: $\mu_u,\mu_v$, and so on.
+
+\item Use the standard conditioning formulas, Eqn. (\ref{eq:cond1}), to find the conditional distribution. $v\sim N(\tilde \mu_u, \tilde \Sigma_{uu})$, with
+
+\begin{align}
+\tilde\mu_v=&\mu_v + \Sigma_{vu} \Sigma_{uu}\inv(b-\mu_u) \notag \\
+\tilde\Sigma_{vv}=& \Sigma_{vv} - \Sigma_{vu} \Sigma_{uu}\inv \Sigma_{uv} \notag
+\end{align}
+%
+\item Transform back to $\xi=H\zeta$. The conditional distribution of $\xi$ has mean and variance
+
+\begin{align*}
+\tilde \mu_\xi=& H\left(
+\begin{array}{c}
+b\\
+\tilde\mu_v
+\end{array}
+\right) = Ab + B \tilde\mu_v \\
+\tilde \Sigma_{\xi}= & H
+\left(
+\begin{array}{cc}
+0 & 0\\
+0 & \tilde\Sigma_{vv}
+\end{array}
+\right) H\transpose = B\tilde\Sigma_{vv} B\transpose
+\end{align*}
+\end{enumerate}
+
+This concludes the proof. However, if we want compact and explicit formulas for $\tilde \mu_\xi$ and $\tilde \Sigma_{\xi}$, then we have to suffer through the algebra.
+
+\begin{align*}
+\mu_u = & A\transpose \mu_\xi\\
+\mu_v = & B\transpose\mu_\xi\\
+\Sigma_{uu} = & A\transpose \Sigma_\xi A \\
+\Sigma_{uv} = & A\transpose \Sigma_\xi B\\
+\Sigma_{vu} = & B\transpose \Sigma_\xi A\\
+\Sigma_{vv} = & B\transpose \Sigma_\xi B
+\end{align*}
+
+From which
+\begin{align*}
+\tilde\mu_v=&\mu_v + \Sigma_{vu} \Sigma_{uu}\inv(b-\mu_u) \notag \\
+\tilde\Sigma_{vv}=& \Sigma_{vv} - \Sigma_{vu} \Sigma_{uu}\inv \Sigma_{uv} \\
+\Rightarrow
+\tilde\mu_v=& B\transpose\mu_\xi + B\transpose \Sigma_\xi A (A\transpose \Sigma_\xi A )\inv(b-A\transpose \mu_\xi) \\
+\tilde\Sigma_{vv}=& B\transpose \Sigma_\xi B - B\transpose \Sigma_\xi A ( A\transpose \Sigma_\xi A) \inv A\transpose \Sigma_\xi B
+\end{align*}
+So that at last
+\begin{align*}
+\tilde \mu_\xi=& Ab + B \tilde\mu_v \\
+\tilde \Sigma_{\xi}= & B\tilde\Sigma_{vv} B\transpose \\
+\Rightarrow
+\tilde\mu_\xi = & Ab + B(B\transpose\mu_\xi + B\transpose \Sigma_\xi A (A\transpose \Sigma_\xi A )\inv(b-A\transpose \mu_\xi))\\
+\simeq & Ab + \mu_\xi + \Sigma_\xi A (A\transpose \Sigma_\xi A )\inv(b-A\transpose \mu_\xi) \\
+\tilde \Sigma_{\xi} = & B (B\transpose \Sigma_\xi B - B\transpose \Sigma_\xi A ( A\transpose \Sigma_\xi A) \inv A\transpose \Sigma_\xi B) B\transpose\\
+\simeq & \Sigma_\xi - \Sigma_\xi A ( A\transpose \Sigma_\xi A) \inv A\transpose \Sigma_\xi
+\end{align*}
+
+where we have employed the property $B B\transpose \simeq I$.
+
+The special case where $\mu_\xi=0$ and we are interested in $w\transpose \xi$ is relevant to our application.
+\begin{align*}
+w\transpose \tilde\mu_\xi = & w\transpose [A b + \Sigma_\xi A (A\transpose \Sigma_\xi A)\inv] b\\
+w\transpose \tilde \Sigma_{\xi} w = & w\transpose [ \Sigma_\xi - \Sigma_\xi A ( A\transpose \Sigma_\xi A) \inv A\transpose \Sigma_\xi ] w
+\end{align*}
+The expected return is proportional to $b$, the scenarios returns.
+%
+%
+\subsection{Conditioning Factor Returns}
+The case in which we condition the system based on knowledge of specific factor returns is easy. We use Eq. \ref{eq:cond1} and a factor model. The model is based on three inputs: the loadings matrix $X\in\R^{n\times m}$, the factor covariance matrix $\Omega\in\R^{m\times m}$ and the idiosycratic diagonal variance matrix $D\in\R^{n\times n}$. The asset covariance matrix is $X\Omega X\transpose + D$. Assume that the factor returns have zero expected value, a simplifying assumption that is reasonable in practice. We assume that a set of factors is stressed and experiences returns $\tilde \mu_x$. The conditional returns of the remaining factors, $y$, is still normally distributed. Using Eq. \ref{eq:cond1} we obtain
+
+\begin{align*}
+\tilde\mu_y=& \Sigma_{yx} \Sigma_{xx}\inv \tilde \mu_x \\
+\tilde\Sigma_{yy} =& \Sigma_{yy} - \Sigma_{yx} \Sigma_{xx}\inv \Sigma_{xy}
+\end{align*}
+
+So that the conditional return and asset covariance matrix is
+
+\begin{align*}
+\tilde\mu_\xi = & X \left(
+\begin{array}{c}
+\tilde\mu_x\\
+\tilde\mu_y
+\end{array}
+\right) \\
+\tilde\Sigma_\xi = & X_y \tilde\Sigma_{yy} X_y\transpose + D
+\end{align*}
+%
+%
+%
+\subsection{The optimization setting}
+The objective function is the $\text{VaR}(p)$ of the  PnL portfolio conditional of the scenario returns. This is a weighted sum of the mean and standard deviation:
+
+\begin{align*} 
+ w\transpose [A + \Sigma_\xi A (A\transpose \Sigma_\xi A)\inv] b - k_1( w\transpose [ \Sigma_\xi - \Sigma_\xi A ( A\transpose \Sigma_\xi A) \inv A\transpose \Sigma_\xi ] w)^{1/2}
+\end{align*}
+We minimize the objective function, by adding a a constraint (or a penalty) on the KL distance of the covariance matrix from the model matrix:
+\begin{align*} 
+\min \, & w\transpose [A + X A (A\transpose X  A)\inv] b \\
+&- k_1( w\transpose [ X  - X  A ( A\transpose X  A) \inv A\transpose X  ] w)^{1/2} \\
+&+ k_2 [\trace{\Sigma_\xi X\inv} -n -\log( |\Sigma_\xi X\inv|)]\\
+\suchthat& X \succ 0
+\end{align*}
+We decompose
+$$\Sigma_\xi=U\Lambda_0 U\transpose\qquad X=U\Lambda U\transpose $$
+The third term simplifies to
+\[
+\sum_i \left(
+	\frac{\lambda_{0i}}{\lambda_{i}} -1 -\log \frac{\lambda_{0i}}{\lambda_{i}} 
+\right) 
+\]
+The problem takes an simplified form when $A$ is a column vector. Then, let $k_0= w\transpose A b$, $v_1=U\transpose A$, $v_2=U\transpose w$.
+\begin{align*} 
+\min \, & k_0+ \frac{v_2  \Lambda v_1}{v_1\transpose \Lambda v_1} b \\
+&- k_1\left[\frac{(v_1\transpose \Lambda v_1 )(v_2\transpose \Lambda v_2)- (v_2\transpose \Lambda v_1)^2}{ v_1\transpose \Lambda v_1} \right]^{1/2} \\
+&+ k_2 \sum_i \left(
+	\frac{\lambda_{0i}}{\lambda_{i}} -1 -\log \frac{\lambda_{0i}}{\lambda_{i}} \right) \\
+\suchthat& \lambda_i \ge 0
+\end{align*}
+Finally, we consider a simplified version of this problem. Rather than stress testing the distribution of the conditional PnL (to maximize the VaR), we consider first stress testing the unconditional of the unconditional PnL. After this step, we compute the conditional distribution. The optimization problem becomes
+\begin{align*} 
+\max \, & ( w\transpose  X   w)^{1/2}  - k [\trace{\Sigma_\xi X\inv} -n -\log( |\Sigma_\xi X\inv|)]\\
+\suchthat& X \succ 0
+\end{align*}
+
+
+\subsection{Stressing the Factors}
+The optimization on the entire covariance matrix can be too demanding. Since $\Sigma$ follows a factor structure, we can assume only the factor covariance matrix is stressed. Write $\Sigma = U\Lambda U\transpose + D$. Then $A\transpose \Sigma A = \tilde U\transpose \Lambda \tilde U + D$
+\begin{align*}
+\min \, & c\transpose \Sigma A X b + \lambda \sqrt{ c\transpose ( \Sigma - \Sigma A X A\transpose \Sigma ) c} +\mu \sum_i \left(\frac{\lambda_i}{\lambda_{0i}} -\log \frac{\lambda_i}{\lambda_{0i}} \right) \\
+\suchthat \, & X = (A\transpose \Sigma A) \inv\\
+& \Sigma = U\Lambda U\transpose + D
+\end{align*}
+\bibliographystyle{alpha}
+\bibliography{../bibliography}
+\end{document}
