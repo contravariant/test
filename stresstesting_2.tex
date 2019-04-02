@@ -255,94 +255,11 @@ The \emph{output} of the model is an updated risk model, from which all statisti
 
 The \emph{processing steps} are:
 \begin{enumerate}
-	\item Compute the conditional distribution of returns under the input risk model and the scenario. The scenario returns affect the returns of the entire asset universe since those are in general dependent.
-	\item Stress the input risk model. The conditional distribution is a function of the input risk model. We allow for deviation from the risk model, and the criteria for this deviation is that a) the distance from the stressed risk model and the input risk model is measured as the relative entropy of the former with respect to the latter and is bounded above by the input stress factor; b) the deviation is in the direction of maximizing the loss of the core portfolio.
+	\item Consider a set of \emph{candidate risk models}, defined as those that are within a certain distance of the input risk model. The choice of relative entropy is a natural one to measure distance among probability distributions. Some standard references are Acz{\'e}l \etal \cite{aczel1974},  Csisz{\'a}r \cite{csiszar1991, csiszar2008} and, in Bayesian Statistics, the foundational work of Jaynes \cite{jaines2003}. In the context of stress testing, these constraints have been employed by Breuer and Csisz{\'a}r \cite{breuer2013, breuer2016} and Meucci \cite{meucci2008}.
+	\item For each candidate risk model, compute the conditional distribution of returns under the input risk model and the scenario. The scenario returns affect the returns of the entire asset universe since asset returns are in general dependent. We derive the conditional distribution of returns analytically. This results in large computational speed-ups, compared to simulation approaches.
+	\item Among all candidate risk models, choose the one that results in the highest Value-at-Risk for the core portfolio, based on conditional distributions of returns. 
 \end{enumerate}
-The choice of relative entropy is a natural one to measure distance among probability distributions. Some standard references are Acz{\'e}l \etal \cite{aczel1974},  Csisz{\'a}r \cite{csiszar1991, csiszar2008} and, in Bayesian Statistics, the foundational work of Jaynes \cite{jaines2003}. In the context of stress testing, these constraints have been employed by Breuer and Csisz{\'a}r \cite{breuer2013, breuer2016} and Meucci \cite{meucci2008}.
-\section{Appendix}
-\subsection{Previous Work and Common Approaches}
-
-There is no agreed-upon interpretation of stress-testing in the literature, and the published papers on the subject are few. The most relevant implementation of stress-testing arises from regulations developed in the aftermath of the financial crisis of 2008. Section 164(i)(2) of the Frank-Dodd Act requires that banks with assets over \$10Bn meet stress tests (Dodd-Frank Act Stress Test, or DFAST \cite{fed2013}) specified every year by the Deposit Insurance Corporation. In addition, The Federal Reserve of New York requires that banks with assets over \$50Bn meet additional stress tests (Comprehensive Capital Analysis and Review, or CCAR \cite{fed2017, fed2018}). All tests have the objective of determining the viability (capital adequacy and risk management practices) of these lending institutions in regimes of heightened financial and economic stress. The approach is conceptually straightforward: regulators specify only three scenarios: baseline, adverse, and severely adverse, through the release of quarterly data of macroeconomic indicators (Table \ref{table:DFAST})
-
-\begin{table}[ht]
-
-\centering
-
-\caption{Macroeconomic indicators used to define scenarios of the Dodd-Frank Act Stress Test.}
-
-\label{table:DFAST}
-
-\begin{tabular}{l}
-
-\\
-
-\hline
-
-U.S. real GDP growth \\
-
-U.S. nominal GDP growth \\
-
-U.S. real disposable income growth \\
-
-U.S. nominal disposable income growth \\
-
-U.S. unemployment rate \\
-
-U.S. CPI inflation \\
-
-U.S. 3-month Treasury rate \\
-
-U.S. 5-year Treasury yield \\
-
-U.S. 10-year Treasury yield \\
-
-U.S. BBB corporate yield \\
-
-U.S. mortgage rate \\
-
-U.S. prime rate \\
-
-U.S. Dow Jones Total Stock Market Index\\
-
-U.S. House Price Index \\
-
-U.S. Commercial Real Estate Price Index\\
-
-U.S. Market Volatility Index (VIX) \\
-
-Euro area real GDP growth \\
-
-Euro area inflation \\
-
-Developing Asia real GDP growth \\
-
-Developing Asia inflation \\
-
-Japan real GDP growth \\
-
-Japan inflation \\
-
-U.K. real GDP growth \\
-
-U.K. inflation \\
-
-Exchange rates \\
-
-\hline
-
-\end{tabular}
-
-\end{table}
-
-It is up to the firms to a) specify the causal model relating asset prices to macroeconomic indicators; b) run the scenarios in this model; c) show good calibration properties under the baseline scenario, and adequacy under the adverse scenarios. The core of the exercise is the first part: model building. In this respect, the term ``stress-testing'' is almost a misnomer. The main challenge faced by bank risk groups is to persuade the regulators that their models are credible. The situation faced by an asset manager differs in two important respects. First, we already have a risk model; however, we have reason to believe that the model produces inaccurate forecasts in times of stress. Secondly, our scenarios have higher resolutions than ``baseline/adverse/severely adverse'', and are greater in number. For example: would happen if the portfolio of manager $x$ lost 10\%? Obviously there are correlations between this portfolio and other portfolios in the same firm, so considering the portfolio in isolation underestimating risk; while assuming a 10\% loss across all portfolios severely overestimate it. What if just the energy Explorers and Producers have a large drawdown? What if simply their correlations with midstream and energy services increases? In other words, we need a \emph{flexible and intuitive} language to express our hypothesis on what could go wrong.
-
-Let us review the extant literature specifically devoted to stress testing. Auer \cite{auer2018} devotes two pages to stress testing, in which he views the practice as propagating negative scenarios in the portfolio, possibly via non-linear instruments. Andersen \etal \cite{andersen2013} as well as Stulz \cite{stulz2008} emphasize the importance of \emph{conditional} measures of extreme risk, as opposed to unconditional ones, based on Dan{\'i}elsson \etal \cite{danielsson2016} propose to estimate model risk as the range of forecasts and risk metrics generated by the set of available models. For example, if different GARCH-based models generate VaR estimates that differ by 50\%, a measure of the error of the VaR of the baseline model is 50\%. Becker and Schmidt \cite{becker2013} propose an endogenous stress model, in which factor volatilities and correlations are increasing function of the market state, proxied by drawdown of market indices during a rolling time window. So \etal \cite{so2013}, following \cite{rebonato2000}, propose a numerical procedure to change the correlation matrix while maintaining positive-definiteness. Meucci \cite{meucci2008} proposes to change the change the model probability distribution in order to meet some constraints.
-
-The approaches share one feature. They can all involve changing the probability distribution of the reference model. The mechanism inducing the change differs, and can be divided in two camps. In the first one \cite{fed2013, fed2017, fed2018, meucci2008}, the user specifies scenarios (or views), and then modifies the model accordingly. A simple example would be that of an asset with daily volatility of 1.5\% and zero expected return. Its model-based 1\% VaR is -3.5\%. If we require that, under an adverse scenario the 1\% VaR be -10\%, then, assuming that the asset is still normally distributed, it must have a volatility of 4.3\%. This volatility, together with that of other assets will be the used to estimate the stress-tested risk metric of a portfolio\footnote{A na{\"i}ve scenario-based analysis is also a change of probability distribution; we assign p=1 to the scenario.}.
-
-In the second approach \cite{danielsson2016, so2013, rebonato2000}, the user changes some parameters of the model family, and checks the impact on the portfolio. To stick to our previous example, this means that we directly increase the volatility of the asset to 5\% and then check the impact on the portfolio.
-
-In the next section we propose an approach that general enough to accommodate both approaches.
+\section{Appendix} 
 %\section{Description of the Quantitative Approach}
 
 %\subsection{Formulation}
@@ -635,7 +552,7 @@ In the next section we propose an approach that general enough to accommodate bo
 
 %\end{enumerate}
 
-\section{Appendix: Conditional Expectation for Multivariate Gaussians}
+\subsection{Conditional Expectation for Multivariate Gaussians}
 
 Let $\xi$ a random vector distributed according to a multivariate Normal with mean $\mu_\xi\in\R^n$ and variance $\Sigma_\xi \in\R^{n\times n}$. Partition the vector $\xi$ in two sub-vectors $x\in \R^m, y\in\R^{n-m}$. Notation:
 
@@ -795,14 +712,13 @@ The third term simplifies to
 \[
 \sum_i \left(
 	\frac{\lambda_{0i}}{\lambda_{i}} -1 -\log \frac{\lambda_{0i}}{\lambda_{i}} 
-\right) 
+\right) \simeq \frac{1}{2} \left(  \frac{\lambda_{i}}{\lambda_{0i}}-1 \right)^2 + o(2)= \frac{1}{2}\left(\trace{\Lambda \Lambda_0\inv} -n \right)^2 +o(2)
 \]
-The problem takes an simplified form when $A$ is a column vector. Then, let $k_0= w\transpose A b$, $v_1=U\transpose A$, $v_2=U\transpose w$.
+The problem takes a simplified form when $A$ is a column vector. Then, let $k_0= w\transpose A b$, $v_1=U\transpose A$, $v_2=U\transpose w$.
 \begin{align*} 
 \min \, & k_0+ \frac{v_2  \Lambda v_1}{v_1\transpose \Lambda v_1} b \\
 &- k_1\left[\frac{(v_1\transpose \Lambda v_1 )(v_2\transpose \Lambda v_2)- (v_2\transpose \Lambda v_1)^2}{ v_1\transpose \Lambda v_1} \right]^{1/2} \\
-&+ k_2 \sum_i \left(
-	\frac{\lambda_{0i}}{\lambda_{i}} -1 -\log \frac{\lambda_{0i}}{\lambda_{i}} \right) \\
+&+ k_2 \sum_i \frac{1}{2}\left( \frac{\lambda_{i}}{\lambda_{0i}}-1 \right)^2  \\
 \suchthat& \lambda_i \ge 0
 \end{align*}
 Finally, we consider a simplified version of this problem. Rather than stress testing the distribution of the conditional PnL (to maximize the VaR), we consider first stress testing the unconditional of the unconditional PnL. After this step, we compute the conditional distribution. The optimization problem becomes
@@ -810,7 +726,87 @@ Finally, we consider a simplified version of this problem. Rather than stress te
 \max \, & ( w\transpose  X   w)^{1/2}  - k [\trace{\Sigma_\xi X\inv} -n -\log( |\Sigma_\xi X\inv|)]\\
 \suchthat& X \succ 0
 \end{align*}
+\subsection{Previous Work and Common Approaches}
+%
+There is no agreed-upon interpretation of stress-testing in the literature, and the published papers on the subject are few. The most relevant implementation of stress-testing arises from regulations developed in the aftermath of the financial crisis of 2008. Section 164(i)(2) of the Frank-Dodd Act requires that banks with assets over \$10Bn meet stress tests (Dodd-Frank Act Stress Test, or DFAST \cite{fed2013}) specified every year by the Deposit Insurance Corporation. In addition, The Federal Reserve of New York requires that banks with assets over \$50Bn meet additional stress tests (Comprehensive Capital Analysis and Review, or CCAR \cite{fed2017, fed2018}). All tests have the objective of determining the viability (capital adequacy and risk management practices) of these lending institutions in regimes of heightened financial and economic stress. The approach is conceptually straightforward: regulators specify only three scenarios: baseline, adverse, and severely adverse, through the release of quarterly data of macroeconomic indicators (Table \ref{table:DFAST})
 
+\begin{table}[ht]
+
+\centering
+
+\caption{Macroeconomic indicators used to define scenarios of the Dodd-Frank Act Stress Test.}
+
+\label{table:DFAST}
+
+\begin{tabular}{l}
+
+\\
+
+\hline
+
+U.S. real GDP growth \\
+
+U.S. nominal GDP growth \\
+
+U.S. real disposable income growth \\
+
+U.S. nominal disposable income growth \\
+
+U.S. unemployment rate \\
+
+U.S. CPI inflation \\
+
+U.S. 3-month Treasury rate \\
+
+U.S. 5-year Treasury yield \\
+
+U.S. 10-year Treasury yield \\
+
+U.S. BBB corporate yield \\
+
+U.S. mortgage rate \\
+
+U.S. prime rate \\
+
+U.S. Dow Jones Total Stock Market Index\\
+
+U.S. House Price Index \\
+
+U.S. Commercial Real Estate Price Index\\
+
+U.S. Market Volatility Index (VIX) \\
+
+Euro area real GDP growth \\
+
+Euro area inflation \\
+
+Developing Asia real GDP growth \\
+
+Developing Asia inflation \\
+
+Japan real GDP growth \\
+
+Japan inflation \\
+
+U.K. real GDP growth \\
+
+U.K. inflation \\
+
+Exchange rates \\
+
+\hline
+
+\end{tabular}
+
+\end{table}
+
+It is up to the firms to a) specify the causal model relating asset prices to macroeconomic indicators; b) run the scenarios in this model; c) show good calibration properties under the baseline scenario, and adequacy under the adverse scenarios. The core of the exercise is the first part: model building. In this respect, the term ``stress-testing'' is almost a misnomer. The main challenge faced by bank risk groups is to persuade the regulators that their models are credible. The situation faced by an asset manager differs in two important respects. First, we already have a risk model; however, we have reason to believe that the model produces inaccurate forecasts in times of stress. Secondly, our scenarios have higher resolutions than ``baseline/adverse/severely adverse'', and are greater in number. For example: would happen if the portfolio of manager $x$ lost 10\%? Obviously there are correlations between this portfolio and other portfolios in the same firm, so considering the portfolio in isolation underestimating risk; while assuming a 10\% loss across all portfolios severely overestimate it. What if just the energy Explorers and Producers have a large drawdown? What if simply their correlations with midstream and energy services increases? In other words, we need a \emph{flexible and intuitive} language to express our hypothesis on what could go wrong.
+
+Let us review the extant literature specifically devoted to stress testing. Auer \cite{auer2018} devotes two pages to stress testing, in which he views the practice as propagating negative scenarios in the portfolio, possibly via non-linear instruments. Andersen \etal \cite{andersen2013} as well as Stulz \cite{stulz2008} emphasize the importance of \emph{conditional} measures of extreme risk, as opposed to unconditional ones, based on Dan{\'i}elsson \etal \cite{danielsson2016} propose to estimate model risk as the range of forecasts and risk metrics generated by the set of available models. For example, if different GARCH-based models generate VaR estimates that differ by 50\%, a measure of the error of the VaR of the baseline model is 50\%. Becker and Schmidt \cite{becker2013} propose an endogenous stress model, in which factor volatilities and correlations are increasing function of the market state, proxied by drawdown of market indices during a rolling time window. So \etal \cite{so2013}, following \cite{rebonato2000}, propose a numerical procedure to change the correlation matrix while maintaining positive-definiteness. Meucci \cite{meucci2008} proposes to change the change the model probability distribution in order to meet some constraints.
+
+The approaches share one feature: they all involve changing the probability distribution of the reference model. The mechanism inducing the change differs, and can be divided in two camps. In the first one \cite{fed2013, fed2017, fed2018, meucci2008}, the user specifies scenarios (or views), and then modifies the model accordingly. A simple example would be that of an asset with daily volatility of 1.5\% and zero expected return. Its model-based 1\% VaR is -3.5\%. If we require that, under an adverse scenario the 1\% VaR be -10\%, then, assuming that the asset is still normally distributed, it must have a volatility of 4.3\%. This volatility, together with that of other assets will be the used to estimate the stress-tested risk metric of a portfolio\footnote{A na{\"i}ve scenario-based analysis is also a change of probability distribution; we assign p=1 to the scenario.}.
+
+In the second approach \cite{danielsson2016, so2013, rebonato2000}, the user changes some parameters of the model family, and checks the impact on the portfolio. To stick to our previous example, this means that we directly increase the volatility of the asset to 5\% and then check the impact on the portfolio.
 %
 %\subsection{Stressing the Factors}
 %The optimization on the entire covariance matrix can be too demanding. Since $\Sigma$ follows a factor structure, we can assume only the factor covariance matrix is stressed. Write $\Sigma = U\Lambda U\transpose + D$. Then $A\transpose \Sigma A = \tilde U\transpose \Lambda \tilde U + D$
