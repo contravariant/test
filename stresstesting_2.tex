@@ -664,15 +664,15 @@ So that at last
 where we have employed the property $B B\transpose \simeq I$.
 
 The special case where $\mu_\xi=0$ and we are interested in $w\transpose \xi$ is relevant to our application.
-\begin{align*}
-w\transpose \tilde\mu_\xi = & w\transpose [A b + \Sigma_\xi A (A\transpose \Sigma_\xi A)\inv] b\\
-w\transpose \tilde \Sigma_{\xi} w = & w\transpose [ \Sigma_\xi - \Sigma_\xi A ( A\transpose \Sigma_\xi A) \inv A\transpose \Sigma_\xi ] w
-\end{align*}
+\begin{align}
+w\transpose \tilde\mu_\xi = & w\transpose [A b + \Sigma_\xi A (A\transpose \Sigma_\xi A)\inv] b\label{eq:cond2}\\
+w\transpose \tilde \Sigma_{\xi} w = & w\transpose [ \Sigma_\xi - \Sigma_\xi A ( A\transpose \Sigma_\xi A) \inv A\transpose \Sigma_\xi ] w\notag
+\end{align}
 The expected return is proportional to $b$, the scenarios returns.
 %
 %
 \subsection{Conditioning Factor Returns}
-The case in which we condition the system based on knowledge of specific factor returns is easy. We use Eq. \ref{eq:cond1} and a factor model. The model is based on three inputs: the loadings matrix $X\in\R^{n\times m}$, the factor covariance matrix $\Omega\in\R^{m\times m}$ and the idiosycratic diagonal variance matrix $D\in\R^{n\times n}$. The asset covariance matrix is $X\Omega X\transpose + D$. Assume that the factor returns have zero expected value, a simplifying assumption that is reasonable in practice. We assume that a set of factors is stressed and experiences returns $\tilde \mu_x$. The conditional returns of the remaining factors, $y$, is still normally distributed. Using Eq. \ref{eq:cond1} we obtain
+The case in which we condition the system based on knowledge of specific factor returns is easy. We use Eq. \ref{eq:cond1} and a factor model. The model is based on three inputs: the loadings matrix $L\in\R^{n\times m}$, the factor covariance matrix $\Omega\in\R^{m\times m}$ and the idiosycratic diagonal variance matrix $D\in\R^{n\times n}$. The asset covariance matrix is $L\Omega L\transpose + D$. Assume that the factor returns have zero expected value, a simplifying assumption that is reasonable in practice. We assume that a set of factors is stressed and experiences returns $\tilde \mu_x$. The conditional returns of the remaining factors, $y$, is still normally distributed. Using Eq. \ref{eq:cond1} we obtain
 
 \begin{align*}
 \tilde\mu_y=& \Sigma_{yx} \Sigma_{xx}\inv \tilde \mu_x \\
@@ -682,18 +682,18 @@ The case in which we condition the system based on knowledge of specific factor 
 So that the conditional return and asset covariance matrix is
 
 \begin{align*}
-\tilde\mu_\xi = & X \left(
+\tilde\mu_\xi = & L \left(
 \begin{array}{c}
 \tilde\mu_x\\
 \tilde\mu_y
 \end{array}
 \right) \\
-\tilde\Sigma_\xi = & X_y \tilde\Sigma_{yy} X_y\transpose + D
+\tilde\Sigma_\xi = & L_y \tilde\Sigma_{yy} L_y\transpose + D
 \end{align*}
 %
 %
 %
-\subsection{The optimization setting}
+\subsection{The optimization Setting and Local Solution}
 The objective function is the $\text{VaR}(p)$ of the  PnL portfolio conditional of the scenario returns. This is a weighted sum of the mean and standard deviation:
 
 \begin{align*} 
@@ -701,31 +701,72 @@ The objective function is the $\text{VaR}(p)$ of the  PnL portfolio conditional 
 \end{align*}
 We minimize the objective function, by adding a a constraint (or a penalty) on the KL distance of the covariance matrix from the model matrix:
 \begin{align*} 
-\min \, & w\transpose [A + X A (A\transpose X  A)\inv] b \\
+\Sigma_\xi^\star (\delta) :=\arg\min \, & w\transpose [A + X A (A\transpose X  A)\inv] b \\
 &- k_1( w\transpose [ X  - X  A ( A\transpose X  A) \inv A\transpose X  ] w)^{1/2} \\
-&+ k_2 [\trace{\Sigma_\xi X\inv} -n -\log( |\Sigma_\xi X\inv|)]\\
-\suchthat& X \succ 0
+\suchthat &[\trace{\Sigma_\xi X\inv} -n -\log( |\Sigma_\xi X\inv|)]\le \delta^2/2 \\
+  & X \succ 0
 \end{align*}
-We decompose
-$$\Sigma_\xi=U\Lambda_0 U\transpose\qquad X=U\Lambda U\transpose $$
-The third term simplifies to
+We decompose $\Sigma_\xi$ using the SVD: $\Sigma_\xi=U\Lambda_0 U\transpose$, and make the assumption that $X$ share $\Sigma_\xi$'s eigenvectors, i.e.,  $X=U\Lambda U\transpose $.
+We investigate solutions in the limit $\delta \downarrow 0$. The left hand side of the constraint simplifies to
 \[
 \sum_i \left(
 	\frac{\lambda_{0i}}{\lambda_{i}} -1 -\log \frac{\lambda_{0i}}{\lambda_{i}} 
-\right) \simeq \frac{1}{2} \left(  \frac{\lambda_{i}}{\lambda_{0i}}-1 \right)^2 + o(2)= \frac{1}{2}\left(\trace{\Lambda \Lambda_0\inv} -n \right)^2 +o(2)
+\right)  
 \]
-The problem takes a simplified form when $A$ is a column vector. Then, let $k_0= w\transpose A b$, $v_1=U\transpose A$, $v_2=U\transpose w$.
-\begin{align*} 
-\min \, & k_0+ \frac{v_2  \Lambda v_1}{v_1\transpose \Lambda v_1} b \\
-&- k_1\left[\frac{(v_1\transpose \Lambda v_1 )(v_2\transpose \Lambda v_2)- (v_2\transpose \Lambda v_1)^2}{ v_1\transpose \Lambda v_1} \right]^{1/2} \\
-&+ k_2 \sum_i \frac{1}{2}\left( \frac{\lambda_{i}}{\lambda_{0i}}-1 \right)^2  \\
-\suchthat& \lambda_i \ge 0
+and for small values of $\delta$ the feasible region is a neighborhood of $\lambda_0$ and the constraint can be approximated by a quadratic constraint:
+\[
+\sum_i \left(
+	\frac{\lambda_{0i}}{\lambda_{i}} -1 -\log \frac{\lambda_{0i}}{\lambda_{i}} 
+\right) \simeq \frac{1}{2} \left(  \frac{\lambda_{i}}{\lambda_{0i}}-1 \right)^2=\frac{1}{2}(\lambda-\lambda_0)\transpose \Lambda_0^{-2}(\lambda-\lambda_0)
+\]
+Let $F(\lambda)$ be the objective function; define 
+\begin{align*}
+k_0:= &w\transpose A b & \\
+C:=&A \transpose U & (p\times n)\\ 
+v:=&U\transpose w & (n\times 1)
 \end{align*}
-Finally, we consider a simplified version of this problem. Rather than stress testing the distribution of the conditional PnL (to maximize the VaR), we consider first stress testing the unconditional of the unconditional PnL. After this step, we compute the conditional distribution. The optimization problem becomes
-\begin{align*} 
-\max \, & ( w\transpose  X   w)^{1/2}  - k [\trace{\Sigma_\xi X\inv} -n -\log( |\Sigma_\xi X\inv|)]\\
-\suchthat& X \succ 0
+ We rewrite $F$
+\begin{align*}
+	F(\lambda) =& k_0+ v\transpose\Lambda C\transpose (C\Lambda C\transpose)\inv  b- k_1\left[v\transpose \left(\Lambda - \Lambda C\transpose (C\Lambda C\transpose)\inv C\Lambda \right) v\transpose \right]^{1/2}
 \end{align*}
+which in turns allows us to efficiently compute the function gradient $g:=\nabla F(\lambda_0)$.
+We rewrite the linearized optimization problem as
+\begin{align*}
+\min\, & g\transpose(\lambda-\lambda_0)\\
+	\suchthat\, & \frac{1}{2}(\lambda-\lambda_0)\transpose \Lambda_0^{-2}(\lambda-\lambda_0) \le \delta^2/2 
+\end{align*}
+Let $\tilde g=\Lambda_0 g$ and $x=\Lambda_0\inv(\lambda-\lambda_0)$. The problem becomes
+\begin{align*}
+\min\, & \tilde g\transpose x\\
+	\suchthat\, &  \norm{x}^2 \le \delta^2 
+\end{align*}
+which is solved by  $x^\star=-\delta\tilde g/\norm{g}$.
+\[
+\lambda=\lambda_0- \frac{\delta}{\norm{\tilde g} }\tilde g
+\]
+and
+\[
+\Sigma_\xi(\delta)^\star =\Sigma_\xi- \norm{\tilde g}\inv  U \diag{\tilde g} U\transpose \delta
+\]
+The conditional stressed mean and standard deviation of the portfolio are obtained by using the above covariance matrix in Eq. (\ref{eq:cond2}).
+ %
+\subsection{Optimization with Factor Stresses}
+The optimization problem is 
+\begin{align*}
+\min \, & w\transpose  L_y  X_{yx} X_{xx}\inv \tilde \mu_x  \\
+    & - k_1 \left( w\transpose L_y (X_{yy} - X_{yx} \Sigma_{xx}\inv  X_{xy}) L_y\transpose w \right)^{1/2} \\
+        &+ k_2 [\trace{\Sigma_\xi X\inv} -n -\log( |\Sigma_\xi X\inv|)]\\
+        \suchthat& X \succ 0
+\end{align*}
+%
+%\begin{array}{c}
+%\tilde\mu_x\\
+%\tilde\mu_y
+%\end{array}
+%\right) \\
+%\tilde\Sigma_\xi = & X_y \tilde\Sigma_{yy} X_y\transpose + D
+%\end{align*}
+%
 \subsection{Previous Work and Common Approaches}
 %
 There is no agreed-upon interpretation of stress-testing in the literature, and the published papers on the subject are few. The most relevant implementation of stress-testing arises from regulations developed in the aftermath of the financial crisis of 2008. Section 164(i)(2) of the Frank-Dodd Act requires that banks with assets over \$10Bn meet stress tests (Dodd-Frank Act Stress Test, or DFAST \cite{fed2013}) specified every year by the Deposit Insurance Corporation. In addition, The Federal Reserve of New York requires that banks with assets over \$50Bn meet additional stress tests (Comprehensive Capital Analysis and Review, or CCAR \cite{fed2017, fed2018}). All tests have the objective of determining the viability (capital adequacy and risk management practices) of these lending institutions in regimes of heightened financial and economic stress. The approach is conceptually straightforward: regulators specify only three scenarios: baseline, adverse, and severely adverse, through the release of quarterly data of macroeconomic indicators (Table \ref{table:DFAST})
