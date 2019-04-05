@@ -665,31 +665,37 @@ where we have employed the property $B B\transpose \simeq I$.
 
 The special case where $\mu_\xi=0$ and we are interested in $w\transpose \xi$ is relevant to our application.
 \begin{align}
-w\transpose \tilde\mu_\xi = & w\transpose [A b + \Sigma_\xi A (A\transpose \Sigma_\xi A)\inv] b\label{eq:cond2}\\
+w\transpose \tilde\mu_\xi = & w\transpose [A  + \Sigma_\xi A (A\transpose \Sigma_\xi A)\inv] b\label{eq:cond2}\\
 w\transpose \tilde \Sigma_{\xi} w = & w\transpose [ \Sigma_\xi - \Sigma_\xi A ( A\transpose \Sigma_\xi A) \inv A\transpose \Sigma_\xi ] w\notag
 \end{align}
 The expected return is proportional to $b$, the scenarios returns.
+
+A special case is that where the covariance matrix follows from a factor model, and the scenarios correspond to factor portfolios: $\Sigma_\xi = L\Omega L\transpose +D$, and $A$ is such that  $A \transpose D A\ll 1$, and each column of $A$ have one exposure to one factor and zero to the others, Then $(A\transpose \Sigma_\xi A)\inv=\tilde\Omega\inv$, where $\tilde\Omega$ is the submatrix of the factor covariance matrix corresponding to the scenario factors. $\Sigma_\xi A=L\Omega L\transpose A$. Let $e:=L\transpose w$ be the portfolio factor exposures.
+\begin{align}
+w\transpose \tilde\mu_\xi = & [\tilde e\transpose  + e\transpose\Omega L\transpose A \tilde\Omega\inv] b\label{eq:cond2a}\\
+w\transpose \tilde \Sigma_{\xi} w = &  e\transpose\Omega e +w\transpose Dw - e\transpose\Omega L\transpose A \tilde\Omega\inv  A\transpose L\Omega e \notag
+\end{align}
 %
 %
-\subsection{Conditioning Factor Returns}
-The case in which we condition the system based on knowledge of specific factor returns is easy. We use Eq. \ref{eq:cond1} and a factor model. The model is based on three inputs: the loadings matrix $L\in\R^{n\times m}$, the factor covariance matrix $\Omega\in\R^{m\times m}$ and the idiosycratic diagonal variance matrix $D\in\R^{n\times n}$. The asset covariance matrix is $L\Omega L\transpose + D$. Assume that the factor returns have zero expected value, a simplifying assumption that is reasonable in practice. We assume that a set of factors is stressed and experiences returns $\tilde \mu_x$. The conditional returns of the remaining factors, $y$, is still normally distributed. Using Eq. \ref{eq:cond1} we obtain
-
-\begin{align*}
-\tilde\mu_y=& \Sigma_{yx} \Sigma_{xx}\inv \tilde \mu_x \\
-\tilde\Sigma_{yy} =& \Sigma_{yy} - \Sigma_{yx} \Sigma_{xx}\inv \Sigma_{xy}
-\end{align*}
-
-So that the conditional return and asset covariance matrix is
-
-\begin{align*}
-\tilde\mu_\xi = & L \left(
-\begin{array}{c}
-\tilde\mu_x\\
-\tilde\mu_y
-\end{array}
-\right) \\
-\tilde\Sigma_\xi = & L_y \tilde\Sigma_{yy} L_y\transpose + D
-\end{align*}
+%\subsection{Conditioning Factor Returns}
+%The case in which we condition the system based on knowledge of specific factor returns is easy. We use Eq. \ref{eq:cond1} and a factor model. The model is based on three inputs: the loadings matrix $L\in\R^{n\times m}$, the factor covariance matrix $\Omega\in\R^{m\times m}$ and the idiosycratic diagonal variance matrix $D\in\R^{n\times n}$. The asset covariance matrix is $L\Omega L\transpose + D$. Assume that the factor returns have zero expected value, a simplifying assumption that is reasonable in practice. We assume that a set of factors is stressed and experiences returns $\tilde \mu_x$. The conditional returns of the remaining factors, $y$, is still normally distributed. Using Eq. \ref{eq:cond1} we obtain
+%
+%\begin{align*}
+%\tilde\mu_y=& \Sigma_{yx} \Sigma_{xx}\inv \tilde \mu_x \\
+%\tilde\Sigma_{yy} =& \Sigma_{yy} - \Sigma_{yx} \Sigma_{xx}\inv \Sigma_{xy}
+%\end{align*}
+%
+%So that the conditional return and asset covariance matrix is
+%
+%\begin{align*}
+%\tilde\mu_\xi = & L \left(
+%\begin{array}{c}
+%\tilde\mu_x\\
+%\tilde\mu_y
+%\end{array}
+%\right) \\
+%\tilde\Sigma_\xi = & L_y \tilde\Sigma_{yy} L_y\transpose + D
+%\end{align*}
 %
 %
 %
@@ -740,7 +746,7 @@ Let $\tilde g=\Lambda_0 g$ and $x=\Lambda_0\inv(\lambda-\lambda_0)$. The problem
 \min\, & \tilde g\transpose x\\
 	\suchthat\, &  \norm{x}^2 \le \delta^2 
 \end{align*}
-which is solved by  $x^\star=-\delta\tilde g/\norm{g}$.
+which is solved by  $x^\star=-\delta\tilde g/\norm{\tilde g}$.
 \[
 \lambda=\lambda_0- \frac{\delta}{\norm{\tilde g} }\tilde g
 \]
@@ -750,14 +756,14 @@ and
 \]
 The conditional stressed mean and standard deviation of the portfolio are obtained by using the above covariance matrix in Eq. (\ref{eq:cond2}).
  %
-\subsection{Optimization with Factor Stresses}
-The optimization problem is 
-\begin{align*}
-\min \, & w\transpose  L_y  X_{yx} X_{xx}\inv \tilde \mu_x  \\
-    & - k_1 \left( w\transpose L_y (X_{yy} - X_{yx} \Sigma_{xx}\inv  X_{xy}) L_y\transpose w \right)^{1/2} \\
-        &+ k_2 [\trace{\Sigma_\xi X\inv} -n -\log( |\Sigma_\xi X\inv|)]\\
-        \suchthat& X \succ 0
-\end{align*}
+%\subsection{Optimization with Factor Stresses}
+%The optimization problem is 
+%\begin{align*}
+%\min \, & w\transpose  L_y  X_{yx} X_{xx}\inv \tilde \mu_x  \\
+%    & - k_1 \left( w\transpose L_y (X_{yy} - X_{yx} \Sigma_{xx}\inv  X_{xy}) L_y\transpose w \right)^{1/2} \\
+%        &+ k_2 [\trace{\Sigma_\xi X\inv} -n -\log( |\Sigma_\xi X\inv|)]\\
+%        \suchthat& X \succ 0
+%\end{align*}
 %
 %\begin{array}{c}
 %\tilde\mu_x\\
